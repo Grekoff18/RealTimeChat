@@ -1,14 +1,15 @@
 <template>
-    <div class="input-message-block">
-        <div class="input-message-container">
+    <div class="relative h-10 m-1">
+        <div class="cont grid grid-cols-6">
             <input type="text"
+                class="col-span-5 outline-none p-1"
                 v-model="message"
                 @keyup.enter="sendMessage()"
                 placeholder="Write your message here"
             >
             <button
                 @click="sendMessage()"
-                class="message_btn"
+                class="place-self-end bg-gray-500 hover:bg-blue-700 p-1 mt-1 rounded text-white"
             >
                 Send
             </button>
@@ -18,43 +19,38 @@
 
 <script>
 export default {
-    name: "inputMessage",
     props: ["room"],
+
+    data() {
+        return {
+            message: "",
+        }
+    },
+
+    methods: {
+        sendMessage() {
+            if(this.message === " ") {
+                return
+            }
+            axios.post(`/chat/room/${this.room.id}/message`, {
+                message: this.message,
+            })
+                .then(response => {
+                    if(response.status === 201) {
+                        this.message = ""
+                        this.$emit("messageSend")
+                    }
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+        }
+    }
 }
 </script>
 
 <style scoped>
-.input-message-block {
-    position: relative;
-    height: 10px;
-    margin: 1px;
-}
-
-.input-message-container {
+.cont {
     border-top: 1px solid #e6e6e6;
-    display: grid;
-    grid-column: 6;
-}
-
-.input-message-container > input {
-    grid-column: span 5 / span 5;
-    outline: none;
-    padding: 1px;
-}
-
-.message_btn {
-    place-self: end;
-    --tw-bg-opacity: 1;
-    background-color: rgba(107, 114, 128, var(--tw-bg-opacity));
-    padding: 1px;
-    margin-top: 1px;
-    border-radius: 0.25rem;
-    --tw-text-opacity: 1;
-    color: rgba(255, 255, 255, var(--tw-text-opacity));
-}
-
-.message_btn:hover {
-    --tw-bg-opacity: 1;
-    background-color: rgba(29, 78, 216, var(--tw-bg-opacity));
 }
 </style>
